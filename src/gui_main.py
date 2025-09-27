@@ -11,56 +11,31 @@ class TeaApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Lahijan Tea Sales App")
-        self.root.geometry("800x600")
-        self.frames = []
-        self.current_step = 0
+        self.root.geometry("800x700")
 
         # Background image
-        self.bg_image = Image.open("assets/images/background.jpg")
-        self.bg_image = self.bg_image.resize((800, 600))
-        self.bg_photo = ImageTk.PhotoImage(self.bg_image)
-        self.background = tk.Label(root, image=self.bg_photo)
-        self.background.place(x=0, y=0, relwidth=1, relheight=1)
+        try:
+            self.bg_image = Image.open("assets/images/background.jpg").resize((800,700))
+            self.bg_photo = ImageTk.PhotoImage(self.bg_image)
+            self.background = tk.Label(root, image=self.bg_photo)
+            self.background.place(x=0, y=0, relwidth=1, relheight=1)
+        except Exception as e:
+            print(f"No background image: {e}")
 
-        self.create_steps()
-        self.show_step(0)
+        # Entries
+        self.price_entries = []
+        self.gram_entries = []
 
-        # Result labels
-        self.result_frame = tk.Frame(root, bg="#ffffff", bd=2, relief="ridge")
-        self.result_frame.place(x=50, y=400, width=700, height=100)
-        self.total_cost_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
-        self.total_cost_label.pack(pady=2)
-        self.profit_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
-        self.profit_label.pack(pady=2)
-        self.daily_profit_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
-        self.daily_profit_label.pack(pady=2)
-        self.daily_cost_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
-        self.daily_cost_label.pack(pady=2)
-
-        # Chart
-        self.fig = plt.Figure(figsize=(7, 2))
-        self.canvas = FigureCanvasTkAgg(self.fig, master=root)
-        self.canvas.get_tk_widget().place(x=50, y=510)
-
-        # Footer
-        footer = tk.Frame(root, bg="#eee", height=30)
-        footer.pack(side="bottom", fill="x")
-        tk.Label(footer, text="© 2025 Lahijan Tea App | GitHub: navidwolf", font=("Arial", 10), bg="#eee").pack()
-
-    def create_steps(self):
-        entries = [
+        inputs = [
             ("Purchase price", "assets/images/price_icon.png", "assets/images/weight_icon.png"),
             ("Shipping cost", "assets/images/shipping_icon.png", "assets/images/weight_icon.png"),
             ("Packaging cost", "assets/images/packaging_icon.png", "assets/images/weight_icon.png"),
             ("Selling price", "assets/images/sell_icon.png", "assets/images/weight_icon.png")
         ]
 
-        self.price_entries = []
-        self.gram_entries = []
-
         y_pos = 20
-        for i, (label_text, price_icon, gram_icon) in enumerate(entries):
-            frame = tk.Frame(self.root, bg="#fdf6e3", bd=2, relief="groove")
+        for label_text, price_icon, gram_icon in inputs:
+            frame = tk.Frame(root, bg="#fdf6e3", bd=2, relief="groove")
             frame.place(x=50, y=y_pos, width=700, height=50)
 
             tk.Label(frame, text=label_text, font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
@@ -75,45 +50,50 @@ class TeaApp:
 
             tk.Label(frame, text="grams", font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
 
-            tk.Button(frame, text="Next", font=("Arial", 10, "bold"), bg="#4CAF50", fg="white",
-                      command=lambda idx=i: self.next_step(idx)).pack(side="right", padx=5)
-
-            self.frames.append(frame)
             self.price_entries.append(price_entry)
             self.gram_entries.append(grams_entry)
             y_pos += 70
 
         # Packets per day
-        frame_packets = tk.Frame(self.root, bg="#fdf6e3", bd=2, relief="groove")
+        frame_packets = tk.Frame(root, bg="#fdf6e3", bd=2, relief="groove")
         frame_packets.place(x=50, y=y_pos, width=700, height=50)
         tk.Label(frame_packets, text="Packets sold per day:", font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
         self.packets_entry = tk.Entry(frame_packets, width=10, font=("Arial", 11), bd=2, relief="groove")
         self.packets_entry.pack(side="left", padx=5)
         tk.Button(frame_packets, text="Calculate", font=("Arial", 10, "bold"), bg="#2196F3", fg="white",
                   command=self.calculate_result).pack(side="right", padx=5)
-        self.frames.append(frame_packets)
+
+        # Results
+        self.result_frame = tk.Frame(root, bg="#ffffff", bd=2, relief="ridge")
+        self.result_frame.place(x=50, y=y_pos+70, width=700, height=100)
+        self.total_cost_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
+        self.total_cost_label.pack(pady=2)
+        self.profit_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
+        self.profit_label.pack(pady=2)
+        self.daily_profit_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
+        self.daily_profit_label.pack(pady=2)
+        self.daily_cost_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
+        self.daily_cost_label.pack(pady=2)
+
+        # Chart
+        self.fig = plt.Figure(figsize=(7, 2))
+        self.canvas = FigureCanvasTkAgg(self.fig, master=root)
+        self.canvas.get_tk_widget().place(x=50, y=y_pos+180)
+
+        # Footer
+        footer = tk.Frame(root, bg="#eee", height=30)
+        footer.pack(side="bottom", fill="x")
+        tk.Label(footer, text="© 2025 Lahijan Tea App | GitHub: navidwolf", font=("Arial", 10), bg="#eee").pack()
 
     def add_icon(self, frame, path):
         try:
-            img = Image.open(path).resize((30, 30))
+            img = Image.open(path).resize((30,30))
             photo = ImageTk.PhotoImage(img)
             label = tk.Label(frame, image=photo, bg="#fdf6e3")
             label.image = photo
             label.pack(side="left", padx=3)
         except Exception as e:
             print(f"Could not load icon {path}: {e}")
-
-    def show_step(self, index):
-        for i, f in enumerate(self.frames):
-            if i == index:
-                f.lift()
-            else:
-                f.lower()
-
-    def next_step(self, index):
-        next_index = index + 1
-        if next_index < len(self.frames):
-            self.show_step(next_index)
 
     def calculate_result(self):
         try:
@@ -160,8 +140,7 @@ class TeaApp:
         write_json(output_path, [result])
         messagebox.showinfo("Saved", f"Results saved to {output_path}")
 
-
-# --- Run app ---
+# Run
 root = tk.Tk()
 app = TeaApp(root)
 root.mainloop()

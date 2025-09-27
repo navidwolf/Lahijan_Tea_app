@@ -1,8 +1,8 @@
 [
     {
-        "total_cost_per_packet": 190000.0,
-        "profit_per_packet": 235000.0,
-        "daily_profit": 235000.0,
-        "daily_cost": 190000.0
+        "total_cost_per_packet": 190.0,
+        "profit_per_packet": 235.0,
+        "daily_profit": 235.0,
+        "daily_cost": 190.0
     }
 ]
