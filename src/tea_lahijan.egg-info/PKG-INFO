@@ -1,0 +1,46 @@
+Metadata-Version: 2.4
+Name: tea_lahijan
+Version: 0.1.0
+Summary: برنامه مدیریت کسب‌وکار چای لاهیجان
+Home-page: https://github.com/username/Tea-Project
+Author: Your Name
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+Dynamic: author
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-python
+Dynamic: summary
+
+\# 🌱 TEA\_LAHIJAN Project
+
+
+
+یک اپلیکیشن ساده برای مدیریت کسب‌وکار چای لاهیجان.  
+
+این برنامه هزینه کل، مالیات و سود فروش چای را محاسبه می‌کند.
+
+
+
+---
+
+
+
+\## 📦 نصب
+
+ابتدا مخزن پروژه را کلون کنید:
+
+
+
+```bash
+
+git clone https://github.com/username/Tea-Project.git
+
+cd Tea-Project
+
+
+
