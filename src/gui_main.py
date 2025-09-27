@@ -11,10 +11,9 @@ class TeaApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Lahijan Tea Sales App")
+        self.frames = []
         self.current_step = 0
 
-        # Frames for each step
-        self.frames = []
         self.create_steps()
         self.show_step(0)
 
@@ -34,12 +33,12 @@ class TeaApp:
         self.canvas.get_tk_widget().pack()
 
     def create_steps(self):
-        # Each step: price + grams with icons
+        # تعریف ورودی‌ها: (label متن، آیکون قیمت، آیکون وزن)
         entries = [
-            ("Enter purchase price:", "assets/images/price_icon.png", "assets/images/weight_icon.png"),
-            ("Enter shipping cost:", "assets/images/shipping_icon.png", "assets/images/weight_icon.png"),
-            ("Enter packaging cost:", "assets/images/packaging_icon.png", "assets/images/weight_icon.png"),
-            ("Enter selling price:", "assets/images/sell_icon.png", "assets/images/weight_icon.png")
+            ("Purchase price", "assets/images/price_icon.png", "assets/images/weight_icon.png"),
+            ("Shipping cost", "assets/images/shipping_icon.png", "assets/images/weight_icon.png"),
+            ("Packaging cost", "assets/images/packaging_icon.png", "assets/images/weight_icon.png"),
+            ("Selling price", "assets/images/sell_icon.png", "assets/images/weight_icon.png")
         ]
 
         self.price_entries = []
@@ -47,29 +46,32 @@ class TeaApp:
 
         for i, (label_text, price_icon, gram_icon) in enumerate(entries):
             frame = tk.Frame(self.root)
-            tk.Label(frame, text=label_text, font=("Arial", 12)).pack(side="left")
 
+            tk.Label(frame, text=label_text, font=("Arial", 12)).pack(side="left", padx=2)
             price_entry = tk.Entry(frame, width=10)
-            price_entry.pack(side="left")
+            price_entry.pack(side="left", padx=2)
             self.add_icon(frame, price_icon)
 
-            gram_entry = tk.Entry(frame, width=10)
-            gram_entry.pack(side="left")
+            tk.Label(frame, text="for", font=("Arial", 12)).pack(side="left", padx=2)
+            grams_entry = tk.Entry(frame, width=10)
+            grams_entry.pack(side="left", padx=2)
             self.add_icon(frame, gram_icon)
 
-            tk.Button(frame, text="Next" if i < len(entries)-1 else "Next", command=lambda idx=i: self.next_step(idx)).pack(side="left")
+            tk.Label(frame, text="grams", font=("Arial", 12)).pack(side="left", padx=2)
+
+            tk.Button(frame, text="Next" if i < len(entries)-1 else "Next", command=lambda idx=i: self.next_step(idx)).pack(side="left", padx=5)
             frame.pack(pady=5)
             self.frames.append(frame)
 
             self.price_entries.append(price_entry)
-            self.gram_entries.append(gram_entry)
+            self.gram_entries.append(grams_entry)
 
         # Step: packets per day
         frame_packets = tk.Frame(self.root)
-        tk.Label(frame_packets, text="Packets sold per day:", font=("Arial", 12)).pack(side="left")
+        tk.Label(frame_packets, text="Packets sold per day:", font=("Arial", 12)).pack(side="left", padx=2)
         self.packets_entry = tk.Entry(frame_packets, width=10)
-        self.packets_entry.pack(side="left")
-        tk.Button(frame_packets, text="Calculate", command=self.calculate_result).pack(side="left")
+        self.packets_entry.pack(side="left", padx=2)
+        tk.Button(frame_packets, text="Calculate", command=self.calculate_result).pack(side="left", padx=5)
         frame_packets.pack(pady=5)
         self.frames.append(frame_packets)
 
@@ -85,7 +87,7 @@ class TeaApp:
             print(f"Could not load icon {path}: {e}")
 
     def show_step(self, index):
-        for i, f in enumerate(self.frames):
+        for f in self.frames:
             f.pack_forget()
         self.frames[index].pack()
 
@@ -103,7 +105,7 @@ class TeaApp:
             messagebox.showerror("Error", "All inputs must be numbers!")
             return
 
-        grams = grams_purchase  # assume all weights equal for simplicity, یا می‌توانید متوسط بگیرید
+        grams = grams_purchase  # می‌توانید میانگین یا همان مقدار اول را بگیرید
 
         total_cost_per_packet = price_purchase + shipping + packaging
         profit_per_packet = selling_price - total_cost_per_packet
@@ -137,7 +139,6 @@ class TeaApp:
         }
         write_json(output_path, [result])
         messagebox.showinfo("Saved", f"Results saved to {output_path}")
-
 
 # --- Run app ---
 root = tk.Tk()
