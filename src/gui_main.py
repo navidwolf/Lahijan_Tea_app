@@ -35,9 +35,14 @@ class TeaApp:
         except Exception as e:
             print(f"No background image: {e}")
 
+        # Responsive grid
+        for i in range(7):
+            self.scroll_frame.grid_columnconfigure(i, weight=1)
+
         # ورودی‌ها
         self.price_entries = []
         self.gram_entries = []
+        self.icon_labels = []
 
         inputs = [
             ("Purchase price", "assets/images/price_icon.png", "assets/images/weight_icon.png"),
@@ -55,7 +60,7 @@ class TeaApp:
         # Calculate Button
         self.calc_button = tk.Button(self.scroll_frame, text="Calculate", font=("Arial", 12, "bold"),
                                      bg="#2196F3", fg="white", command=self.calculate_result)
-        self.calc_button.grid(row=len(inputs)+1, column=0, columnspan=7, pady=10)
+        self.calc_button.grid(row=len(inputs)+1, column=0, columnspan=7, pady=10, sticky="ew")
 
         # Results Frame
         self.result_frame = tk.Frame(self.scroll_frame, bg="#ffffff", bd=2, relief="ridge")
@@ -72,54 +77,67 @@ class TeaApp:
         # Chart
         self.fig = plt.Figure(figsize=(8,2))
         self.canvas_chart = FigureCanvasTkAgg(self.fig, master=self.scroll_frame)
-        self.canvas_chart.get_tk_widget().grid(row=len(inputs)+3, column=0, columnspan=7, pady=5)
+        self.canvas_chart.get_tk_widget().grid(row=len(inputs)+3, column=0, columnspan=7, pady=5, sticky="ew")
 
         # Footer
         footer = tk.Frame(root, bg="#eee", height=30)
         footer.pack(side="bottom", fill="x")
         tk.Label(footer, text="© 2025 Lahijan Tea App | GitHub: navidwolf", font=("Arial", 10), bg="#eee").pack()
 
+        # Bind resize to update icons
+        self.root.bind("<Configure>", self.resize_icons)
+
     def add_input_row(self, row_num, label_text, price_icon, gram_icon):
-        # Column 0: Label
         tk.Label(self.scroll_frame, text=label_text, font=("Arial",12,"bold"), bg="#fdf6e3").grid(
             row=row_num, column=0, padx=5, pady=5, sticky="w")
 
-        # Column 1: Entry قیمت
-        price_entry = tk.Entry(self.scroll_frame, width=10, font=("Arial",11), bd=2, relief="groove")
-        price_entry.grid(row=row_num, column=1, padx=5)
-        self.add_icon_grid(row_num, 2, price_icon)
+        price_entry = tk.Entry(self.scroll_frame, font=("Arial",11), bd=2, relief="groove")
+        price_entry.grid(row=row_num, column=1, padx=5, sticky="ew")
+        price_lbl = self.add_icon_grid(row_num, 2, price_icon)
 
-        # Column 3: Label "for"
         tk.Label(self.scroll_frame, text="for", font=("Arial",12,"bold"), bg="#fdf6e3").grid(
             row=row_num, column=3, padx=5)
+        grams_entry = tk.Entry(self.scroll_frame, font=("Arial",11), bd=2, relief="groove")
+        grams_entry.grid(row=row_num, column=4, padx=5, sticky="ew")
+        grams_lbl = self.add_icon_grid(row_num, 5, gram_icon)
 
-        # Column 4: Entry گرم
-        grams_entry = tk.Entry(self.scroll_frame, width=10, font=("Arial",11), bd=2, relief="groove")
-        grams_entry.grid(row=row_num, column=4, padx=5)
-        self.add_icon_grid(row_num, 5, gram_icon)
-
-        # Column 6: Label "grams"
         tk.Label(self.scroll_frame, text="grams", font=("Arial",12,"bold"), bg="#fdf6e3").grid(
             row=row_num, column=6, padx=5)
 
         self.price_entries.append(price_entry)
         self.gram_entries.append(grams_entry)
+        self.icon_labels.append((price_lbl, price_icon))
+        self.icon_labels.append((grams_lbl, gram_icon))
 
     def add_packets_row(self, row_num):
         tk.Label(self.scroll_frame, text="Packets sold per day:", font=("Arial",12,"bold"), bg="#fdf6e3").grid(
             row=row_num, column=0, padx=5, pady=5, sticky="w")
-        self.packets_entry = tk.Entry(self.scroll_frame, width=10, font=("Arial",11), bd=2, relief="groove")
-        self.packets_entry.grid(row=row_num, column=1, padx=5)
+        self.packets_entry = tk.Entry(self.scroll_frame, font=("Arial",11), bd=2, relief="groove")
+        self.packets_entry.grid(row=row_num, column=1, padx=5, sticky="ew")
 
     def add_icon_grid(self, row, column, path):
         try:
             img = Image.open(path).resize((30,30))
             photo = ImageTk.PhotoImage(img)
             label = tk.Label(self.scroll_frame, image=photo, bg="#fdf6e3")
-            label.image = photo
+            label.photo = photo
             label.grid(row=row, column=column, padx=3)
+            return label
         except Exception as e:
             print(f"Could not load icon {path}: {e}")
+            return None
+
+    def resize_icons(self, event):
+        # Resize icons proportional به width
+        for lbl, path in self.icon_labels:
+            try:
+                new_size = max(20, event.width // 40)  # proportional size
+                img = Image.open(path).resize((new_size, new_size))
+                photo = ImageTk.PhotoImage(img)
+                lbl.config(image=photo)
+                lbl.photo = photo
+            except:
+                continue
 
     def on_frame_configure(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
@@ -167,6 +185,7 @@ class TeaApp:
         }
         write_json(output_path, [result])
         messagebox.showinfo("Saved", f"Results saved to {output_path}")
+
 
 # Run
 if __name__ == "__main__":
