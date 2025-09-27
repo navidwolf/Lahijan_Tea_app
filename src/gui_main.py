@@ -17,29 +17,29 @@ class TeaApp:
         self.canvas = tk.Canvas(root, bg="#f0f0f0")
         self.scrollbar = tk.Scrollbar(root, orient="vertical", command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-
         self.scrollbar.pack(side="right", fill="y")
         self.canvas.pack(side="left", fill="both", expand=True)
 
+        # Frame داخل Canvas
         self.scroll_frame = tk.Frame(self.canvas, bg="#fdf6e3")
         self.canvas.create_window((0,0), window=self.scroll_frame, anchor="nw")
-
         self.scroll_frame.bind("<Configure>", self.on_frame_configure)
 
-        # Background image اختیاری
+        # Background image ثابت (Resize ندارد)
         try:
-            self.bg_image = Image.open("assets/images/background.jpg").resize((850,700))
-            self.bg_photo = ImageTk.PhotoImage(self.bg_image)
-            bg_label = tk.Label(self.scroll_frame, image=self.bg_photo)
-            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
-        except Exception as e:
-            print(f"No background image: {e}")
+            bg_image = Image.open("assets/images/background.jpg")
+            bg_photo = ImageTk.PhotoImage(bg_image)
+            bg_label = tk.Label(self.scroll_frame, image=bg_photo)
+            bg_label.image = bg_photo
+            bg_label.place(x=0, y=0)
+        except:
+            pass
 
-        # تنظیم ستون‌ها مرتب
+        # تنظیم ستون‌ها minsize برای ثابت بودن Layout
         for i in range(7):
-            self.scroll_frame.grid_columnconfigure(i, weight=0)
+            self.scroll_frame.grid_columnconfigure(i, minsize=100)
 
-        # ورودی‌ها
+        # ورودی‌ها و آیکون‌ها
         self.price_entries = []
         self.gram_entries = []
 
@@ -63,7 +63,7 @@ class TeaApp:
 
         # Results Frame
         self.result_frame = tk.Frame(self.scroll_frame, bg="#ffffff", bd=2, relief="ridge")
-        self.result_frame.grid(row=len(inputs)+2, column=0, columnspan=7, padx=20, pady=5, sticky="ew")
+        self.result_frame.grid(row=len(inputs)+2, column=0, columnspan=7, padx=20, pady=5)
         self.total_cost_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
         self.total_cost_label.pack(pady=2)
         self.profit_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
