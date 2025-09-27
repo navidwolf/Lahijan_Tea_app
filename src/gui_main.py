@@ -20,12 +20,12 @@ class TeaApp:
         self.scrollbar.pack(side="right", fill="y")
         self.canvas.pack(side="left", fill="both", expand=True)
 
-        # Frame داخل Canvas
+        # ScrollFrame
         self.scroll_frame = tk.Frame(self.canvas, bg="#fdf6e3")
         self.canvas.create_window((0,0), window=self.scroll_frame, anchor="nw")
         self.scroll_frame.bind("<Configure>", self.on_frame_configure)
 
-        # Background image ثابت (Resize ندارد)
+        # پس‌زمینه ثابت (Fixed, No Stretch)
         try:
             bg_image = Image.open("assets/images/background.jpg")
             bg_photo = ImageTk.PhotoImage(bg_image)
@@ -35,9 +35,9 @@ class TeaApp:
         except:
             pass
 
-        # تنظیم ستون‌ها minsize برای ثابت بودن Layout
+        # ستون‌ها minsize برای Layout ثابت
         for i in range(7):
-            self.scroll_frame.grid_columnconfigure(i, minsize=100)
+            self.scroll_frame.grid_columnconfigure(i, minsize=120)
 
         # ورودی‌ها و آیکون‌ها
         self.price_entries = []
@@ -87,13 +87,13 @@ class TeaApp:
         tk.Label(self.scroll_frame, text=label_text, font=("Arial",12,"bold"), bg="#fdf6e3").grid(
             row=row_num, column=0, padx=5, pady=5, sticky="w")
 
-        price_entry = tk.Entry(self.scroll_frame, width=10, font=("Arial",11), bd=2, relief="groove")
+        price_entry = tk.Entry(self.scroll_frame, width=12, font=("Arial",11), bd=2, relief="groove")
         price_entry.grid(row=row_num, column=1, padx=5)
         self.add_icon_grid(row_num, 2, price_icon)
 
         tk.Label(self.scroll_frame, text="for", font=("Arial",12,"bold"), bg="#fdf6e3").grid(
             row=row_num, column=3, padx=5)
-        grams_entry = tk.Entry(self.scroll_frame, width=10, font=("Arial",11), bd=2, relief="groove")
+        grams_entry = tk.Entry(self.scroll_frame, width=12, font=("Arial",11), bd=2, relief="groove")
         grams_entry.grid(row=row_num, column=4, padx=5)
         self.add_icon_grid(row_num, 5, gram_icon)
 
@@ -106,7 +106,7 @@ class TeaApp:
     def add_packets_row(self, row_num):
         tk.Label(self.scroll_frame, text="Packets sold per day:", font=("Arial",12,"bold"), bg="#fdf6e3").grid(
             row=row_num, column=0, padx=5, pady=5, sticky="w")
-        self.packets_entry = tk.Entry(self.scroll_frame, width=10, font=("Arial",11), bd=2, relief="groove")
+        self.packets_entry = tk.Entry(self.scroll_frame, width=12, font=("Arial",11), bd=2, relief="groove")
         self.packets_entry.grid(row=row_num, column=1, padx=5)
 
     def add_icon_grid(self, row, column, path):
