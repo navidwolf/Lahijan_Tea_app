@@ -1,4 +1,6 @@
-# تنظیمات کلی پروژه
+# تنظیمات پیشفرض اپلیکیشن
+DEFAULT_INPUT_PATH = "data/input_samples.json"
+DEFAULT_OUTPUT_PATH = "data/output_examples.json"
 
-TAX_RATE = 0.09  # مالیات 9 درصد
+# تنظیمات دیگر اپلیکیشن
 CURRENCY = "تومان"

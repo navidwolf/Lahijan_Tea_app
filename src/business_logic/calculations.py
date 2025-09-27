@@ -1,15 +1,12 @@
-from src.config import TAX_RATE, CURRENCY
+def calculate_profit(cost_per_gram, price_per_gram, shipping_per_gram, packaging_per_gram, grams_per_packet, packets_per_day):
+    """
+    محاسبه سود هر پاکت و سود روزانه
+    """
+    total_cost_per_packet = (cost_per_gram + shipping_per_gram + packaging_per_gram) * grams_per_packet
+    profit_per_packet = (price_per_gram * grams_per_packet) - total_cost_per_packet
+    daily_profit = profit_per_packet * packets_per_day
 
-def calculate_total_cost(price_per_kg, weight_kg):
-    """محاسبه هزینه کل قبل از مالیات"""
-    return price_per_kg * weight_kg
-
-def calculate_final_price(price_per_kg, weight_kg):
-    """محاسبه قیمت نهایی با مالیات"""
-    total = calculate_total_cost(price_per_kg, weight_kg)
-    tax = total * TAX_RATE
-    return total + tax
-
-def calculate_profit(selling_price, cost_price):
-    """محاسبه سود خالص"""
-    return selling_price - cost_price
+    return {
+        "profit_per_packet": round(profit_per_packet, 2),
+        "daily_profit": round(daily_profit, 2)
+    }

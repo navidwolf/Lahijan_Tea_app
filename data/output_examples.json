@@ -1,14 +1,6 @@
-{
-  "results": [
+[
     {
-      "total_cost": 6000000,
-      "final_price": 6540000,
-      "profit": 460000
-    },
-    {
-      "total_cost": 3000000,
-      "final_price": 3270000,
-      "profit": 730000
+        "profit_per_packet": 2.0,
+        "daily_profit": 100.0
     }
-  ]
-}
+]

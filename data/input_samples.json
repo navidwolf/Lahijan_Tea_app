@@ -1,14 +1,10 @@
-{
-  "scenarios": [
+[
     {
-      "price_per_kg": 120000,
-      "weight_kg": 50,
-      "selling_price": 7000000
-    },
-    {
-      "price_per_kg": 150000,
-      "weight_kg": 20,
-      "selling_price": 4000000
+        "cost_per_gram": 0.02,
+        "price_per_gram": 0.05,
+        "shipping_per_gram": 0.01,
+        "packaging_per_gram": 0.005,
+        "grams_per_packet": 100,
+        "packets_per_day": 50
     }
-  ]
-}
+]
