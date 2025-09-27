@@ -13,16 +13,29 @@ class TeaApp:
         self.root.title("Lahijan Tea Sales App")
         self.root.geometry("800x700")
 
-        # Background image
+        # Canvas و Scrollbar
+        self.canvas = tk.Canvas(root, bg="#f0f0f0")
+        self.scrollbar = tk.Scrollbar(root, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+
+        self.scrollbar.pack(side="right", fill="y")
+        self.canvas.pack(side="left", fill="both", expand=True)
+
+        self.scroll_frame = tk.Frame(self.canvas, bg="#fdf6e3")
+        self.canvas.create_window((0,0), window=self.scroll_frame, anchor="nw")
+
+        self.scroll_frame.bind("<Configure>", self.on_frame_configure)
+
+        # Background image (اختیاری)
         try:
             self.bg_image = Image.open("assets/images/background.jpg").resize((800,700))
             self.bg_photo = ImageTk.PhotoImage(self.bg_image)
-            self.background = tk.Label(root, image=self.bg_photo)
-            self.background.place(x=0, y=0, relwidth=1, relheight=1)
+            bg_label = tk.Label(self.scroll_frame, image=self.bg_photo)
+            bg_label.place(x=0, y=0, relwidth=1, relheight=1)
         except Exception as e:
             print(f"No background image: {e}")
 
-        # Entries
+        # ورودی‌ها و آیکون‌ها
         self.price_entries = []
         self.gram_entries = []
 
@@ -33,39 +46,20 @@ class TeaApp:
             ("Selling price", "assets/images/sell_icon.png", "assets/images/weight_icon.png")
         ]
 
-        y_pos = 20
         for label_text, price_icon, gram_icon in inputs:
-            frame = tk.Frame(root, bg="#fdf6e3", bd=2, relief="groove")
-            frame.place(x=50, y=y_pos, width=700, height=50)
-
-            tk.Label(frame, text=label_text, font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
-            price_entry = tk.Entry(frame, width=10, font=("Arial", 11), bd=2, relief="groove")
-            price_entry.pack(side="left", padx=5)
-            self.add_icon(frame, price_icon)
-
-            tk.Label(frame, text="for", font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
-            grams_entry = tk.Entry(frame, width=10, font=("Arial", 11), bd=2, relief="groove")
-            grams_entry.pack(side="left", padx=5)
-            self.add_icon(frame, gram_icon)
-
-            tk.Label(frame, text="grams", font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
-
-            self.price_entries.append(price_entry)
-            self.gram_entries.append(grams_entry)
-            y_pos += 70
+            self.add_input_row(label_text, price_icon, gram_icon)
 
         # Packets per day
-        frame_packets = tk.Frame(root, bg="#fdf6e3", bd=2, relief="groove")
-        frame_packets.place(x=50, y=y_pos, width=700, height=50)
-        tk.Label(frame_packets, text="Packets sold per day:", font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
-        self.packets_entry = tk.Entry(frame_packets, width=10, font=("Arial", 11), bd=2, relief="groove")
-        self.packets_entry.pack(side="left", padx=5)
-        tk.Button(frame_packets, text="Calculate", font=("Arial", 10, "bold"), bg="#2196F3", fg="white",
-                  command=self.calculate_result).pack(side="right", padx=5)
+        self.add_packets_row()
 
-        # Results
-        self.result_frame = tk.Frame(root, bg="#ffffff", bd=2, relief="ridge")
-        self.result_frame.place(x=50, y=y_pos+70, width=700, height=100)
+        # Calculate Button
+        self.calc_button = tk.Button(self.scroll_frame, text="Calculate", font=("Arial", 12, "bold"),
+                                     bg="#2196F3", fg="white", command=self.calculate_result)
+        self.calc_button.pack(pady=10)
+
+        # Results Frame
+        self.result_frame = tk.Frame(self.scroll_frame, bg="#ffffff", bd=2, relief="ridge")
+        self.result_frame.pack(pady=5, padx=20, fill="x")
         self.total_cost_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
         self.total_cost_label.pack(pady=2)
         self.profit_label = tk.Label(self.result_frame, text="", font=("Arial", 12), bg="#ffffff")
@@ -76,14 +70,40 @@ class TeaApp:
         self.daily_cost_label.pack(pady=2)
 
         # Chart
-        self.fig = plt.Figure(figsize=(7, 2))
-        self.canvas = FigureCanvasTkAgg(self.fig, master=root)
-        self.canvas.get_tk_widget().place(x=50, y=y_pos+180)
+        self.fig = plt.Figure(figsize=(7,2))
+        self.canvas_chart = FigureCanvasTkAgg(self.fig, master=self.scroll_frame)
+        self.canvas_chart.get_tk_widget().pack(pady=5)
 
         # Footer
         footer = tk.Frame(root, bg="#eee", height=30)
         footer.pack(side="bottom", fill="x")
         tk.Label(footer, text="© 2025 Lahijan Tea App | GitHub: navidwolf", font=("Arial", 10), bg="#eee").pack()
+
+    def add_input_row(self, label_text, price_icon, gram_icon):
+        row_frame = tk.Frame(self.scroll_frame, bg="#fdf6e3", bd=2, relief="groove")
+        row_frame.pack(pady=5, padx=20, fill="x")
+
+        tk.Label(row_frame, text=label_text, font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
+        price_entry = tk.Entry(row_frame, width=10, font=("Arial", 11), bd=2, relief="groove")
+        price_entry.pack(side="left", padx=5)
+        self.add_icon(row_frame, price_icon)
+
+        tk.Label(row_frame, text="for", font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
+        grams_entry = tk.Entry(row_frame, width=10, font=("Arial", 11), bd=2, relief="groove")
+        grams_entry.pack(side="left", padx=5)
+        self.add_icon(row_frame, gram_icon)
+
+        tk.Label(row_frame, text="grams", font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
+
+        self.price_entries.append(price_entry)
+        self.gram_entries.append(grams_entry)
+
+    def add_packets_row(self):
+        row_frame = tk.Frame(self.scroll_frame, bg="#fdf6e3", bd=2, relief="groove")
+        row_frame.pack(pady=5, padx=20, fill="x")
+        tk.Label(row_frame, text="Packets sold per day:", font=("Arial", 12, "bold"), bg="#fdf6e3").pack(side="left", padx=5)
+        self.packets_entry = tk.Entry(row_frame, width=10, font=("Arial", 11), bd=2, relief="groove")
+        self.packets_entry.pack(side="left", padx=5)
 
     def add_icon(self, frame, path):
         try:
@@ -94,6 +114,9 @@ class TeaApp:
             label.pack(side="left", padx=3)
         except Exception as e:
             print(f"Could not load icon {path}: {e}")
+
+    def on_frame_configure(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
     def calculate_result(self):
         try:
@@ -119,14 +142,14 @@ class TeaApp:
 
         # Chart
         days = list(range(1, 8))
-        daily_profits = [daily_profit] * 7
+        daily_profits = [daily_profit]*7
         self.fig.clear()
         ax = self.fig.add_subplot(111)
         ax.plot(days, daily_profits, marker='o', color="#FF5722")
         ax.set_title("Daily Profit")
         ax.set_xlabel("Day")
         ax.set_ylabel("Profit")
-        self.canvas.draw()
+        self.canvas_chart.draw()
 
         # Save JSON
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -140,7 +163,9 @@ class TeaApp:
         write_json(output_path, [result])
         messagebox.showinfo("Saved", f"Results saved to {output_path}")
 
-# Run
-root = tk.Tk()
-app = TeaApp(root)
-root.mainloop()
+
+# Run app
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TeaApp(root)
+    root.mainloop()
